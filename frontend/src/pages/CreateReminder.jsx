@@ -101,6 +101,12 @@ export default function CreateReminder() {
     );
   }
 
+  useEffect(() => {
+    if (step === 3 && type === 'location' && locationView === 'new' && locationStatus === '') {
+      getCurrentLocation();
+    }
+  }, [step, type, locationView, locationStatus]);
+
   async function saveReminderWithLocation(name, lat, lng) {
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/api/reminders`, {
@@ -316,7 +322,7 @@ export default function CreateReminder() {
                   style={{ justifyContent: 'center', gap: '0.5rem' }}
                 >
                   <MapPin size={15} />
-                  {locationStatus === 'loading' ? 'Getting location…' : 'Use my current location'}
+                  {locationStatus === 'loading' ? 'Getting location…' : locationStatus === 'error' ? 'Retry getting location' : 'Use my current location'}
                 </button>
               )}
               {locationStatus === 'error' && (
