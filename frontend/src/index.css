@@ -1,28 +1,49 @@
+/* ===================================================
+   LOCREMINDER — PLINTH DESIGN SYSTEM
+   Blue + White + Black / Tactile / Medium-density
+   =================================================== */
+
+/* --- Design tokens --- */
 :root {
-  --bg-color: #f9fafb;
-  --text-color: #111827;
-  --accent-color: #2563eb;
-  --accent-hover: #1d4ed8;
-  --card-bg: #ffffff;
-  --border-color: #e5e7eb;
-  --danger-color: #ef4444;
-  --success-color: #10b981;
-  --text-muted: #6b7280;
+  --white:       #FFFFFF;
+  --off-white:   #F7F9FC;
+  --ink:         #0B0B0B;
+  --ink-muted:   #555555;
+  --border:      #0B0B0B;
+  --border-soft: #D9DDE7;
+  --blue:        #2A5BFF;
+  --blue-light:  #E8EEFF;
+  --blue-hover:  #1A4AEF;
+  --danger:      #D93025;
+  --danger-bg:   #FEE7E6;
+  --success:     #1A7A4A;
+  --success-bg:  #D6F5E3;
+  --shadow-btn:  3px 3px 0 0 #0B0B0B;
+  --shadow-card: 4px 4px 0 0 #0B0B0B;
+  --radius:      10px;
+  --radius-sm:   7px;
 }
 
-* {
+/* --- Reset --- */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+html {
+  font-size: 15px;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--off-white);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
 }
 
+/* --- Root shell --- */
 #root {
   display: flex;
   justify-content: center;
@@ -31,137 +52,264 @@ body {
 
 .app-container {
   width: 100%;
-  max-width: 480px;
-  background-color: var(--bg-color);
+  max-width: 520px;
   min-height: 100vh;
-  position: relative;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  background: var(--white);
+  position: relative;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .app-container {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    min-height: calc(100vh - 4rem);
-    border-radius: 24px;
+    margin: 2rem auto;
+    min-height: auto;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
     overflow: hidden;
-    border: 1px solid var(--border-color);
   }
 }
 
+/* --- Top bar / header --- */
 .header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--card-bg);
+  padding: 1rem 1.25rem;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--white);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.content {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-  padding-bottom: 100px;
-}
-
-.empty-state {
+.header-brand {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  margin-top: 4rem;
-  color: var(--text-muted);
+  gap: 1px;
 }
 
-.empty-state p {
-  margin-bottom: 1rem;
+.header-brand .brand-name {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1;
 }
+
+.header-brand .brand-tagline {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.header-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.header-user {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* --- Scrollable content area --- */
+.content {
+  flex: 1;
+  padding: 1.25rem;
+  overflow-y: auto;
+  padding-bottom: 90px;
+}
+
+/* ===================================================
+   BUTTON SYSTEM — Tactile / Physical press feel
+   =================================================== */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  border-radius: 16px;
-  font-weight: 600;
-  font-size: 1.1rem;
+  gap: 0.4rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  border: none;
-  transition: all 0.2s;
+  border: 1.5px solid var(--border);
+  transition: transform 0.1s, box-shadow 0.1s;
   width: 100%;
+  box-shadow: var(--shadow-btn);
+  background: var(--white);
+  color: var(--ink);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+
+.btn:not(:disabled):hover {
+  background: var(--off-white);
+}
+
+.btn:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+
+/* Primary (blue) */
 .btn-primary {
-  background-color: var(--accent-color);
-  color: white;
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--border);
 }
 
-.btn-primary:active {
-  background-color: var(--accent-hover);
-  transform: scale(0.98);
+.btn-primary:not(:disabled):hover {
+  background: var(--blue-hover);
 }
 
-.btn-secondary {
-  background-color: white;
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
+.btn-primary:not(:disabled):active {
+  background: var(--blue-hover);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
 }
 
-.btn-secondary:active {
-  background-color: var(--bg-color);
-}
-
+/* Danger (red) */
 .btn-danger {
-  background-color: #fee2e2;
-  color: var(--danger-color);
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--border);
 }
 
+/* Success */
 .btn-success {
-  background-color: #d1fae5;
-  color: var(--success-color);
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--border);
 }
+
+.btn-success:not(:disabled):hover {
+  filter: brightness(0.96);
+}
+
+/* Icon-only round button */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 0 var(--border);
+  transition: transform 0.1s, box-shadow 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-icon:hover {
+  background: var(--off-white);
+}
+
+.btn-icon:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+
+/* ===================================================
+   FLOATING ACTION AREA
+   =================================================== */
 
 .floating-action {
-  position: absolute;
-  bottom: 2rem;
-  left: 1.5rem;
-  right: 1.5rem;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.875rem 1.25rem;
+  background: var(--white);
+  border-top: 1.5px solid var(--border);
 }
 
-.floating-action .btn {
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
+/* ===================================================
+   CARDS
+   =================================================== */
 
 .card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s;
 }
 
-.card-header {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+.card.card-active {
+  border-color: var(--blue);
+  box-shadow: 4px 4px 0 0 var(--blue);
 }
 
-.card-body {
-  color: var(--text-muted);
+/* Pill badge in card */
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
+}
+
+.card-badge.badge-blue {
+  color: var(--blue);
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.card-meta {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-due-banner {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .card-actions {
@@ -169,55 +317,499 @@ body {
   gap: 0.5rem;
 }
 
-.input-field {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  background: var(--card-bg);
+.card-actions .btn {
+  font-size: 0.78rem;
+  padding: 0.5rem 0.75rem;
 }
 
-.input-field:focus {
-  outline: none;
-  border-color: var(--accent-color);
-}
+.card-actions .btn-success { flex: 1; }
+
+/* ===================================================
+   FORM ELEMENTS
+   =================================================== */
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.1rem;
 }
 
 .form-label {
   display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
 }
 
+.input-field {
+  width: 100%;
+  padding: 0.65rem 0.875rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--white);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px var(--blue-light);
+}
+
+.input-field::placeholder {
+  color: #BABEC8;
+}
+
+/* ===================================================
+   SECTION LABEL
+   =================================================== */
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-soft);
+}
+
+/* ===================================================
+   STEP QUESTION HEADING
+   =================================================== */
+
+.step-question {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  line-height: 1.3;
+}
+
+/* ===================================================
+   CHOICE BUTTONS (Location / Time selection)
+   =================================================== */
+
 .choice-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
 .choice-btn {
-  padding: 1.5rem;
-  border-radius: 16px;
-  border: 2px solid var(--border-color);
-  background: white;
-  font-size: 1.1rem;
-  font-weight: 600;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+
+.choice-btn:hover {
+  background: var(--off-white);
+}
+
+.choice-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+
+.choice-btn.active {
+  background: var(--blue-light);
+  border-color: var(--blue);
+  color: var(--blue);
+  box-shadow: 3px 3px 0 0 var(--blue);
+}
+
+.choice-btn.dashed {
+  border-style: dashed;
+  color: var(--ink-muted);
+  box-shadow: none;
+}
+
+.choice-btn .choice-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--off-white);
+  border: 1.5px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.choice-btn.active .choice-icon {
+  background: var(--blue-light);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* ===================================================
+   VOICE / MIC BUTTON
+   =================================================== */
+
+.mic-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1.5px dashed var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--off-white);
+}
+
+.mic-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--white);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  transition: all 0.2s;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.15s, border-color 0.15s;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 
-.choice-btn.active {
-  border-color: var(--accent-color);
-  background: #eff6ff;
-  color: var(--accent-color);
+.mic-btn:active,
+.mic-btn.listening {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+.mic-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-muted);
+}
+
+.mic-hint.active {
+  color: var(--blue);
+}
+
+/* Inline mic button (inside input row) */
+.mic-inline {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  color: var(--ink);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mic-inline:active,
+.mic-inline.listening {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+}
+
+/* ===================================================
+   STATUS MESSAGES
+   =================================================== */
+
+.status-box {
+  padding: 0.65rem 0.875rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1.5px solid;
+}
+
+.status-box.success {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.status-box.error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.status-box.info {
+  background: var(--blue-light);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+/* ===================================================
+   ERROR BANNER (auth / form errors)
+   =================================================== */
+
+.error-banner {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.875rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* ===================================================
+   EMPTY STATE
+   =================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  gap: 0.4rem;
+  color: var(--ink-muted);
+}
+
+.empty-state .empty-icon {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  color: var(--ink-muted);
+}
+
+.empty-state .empty-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink);
+}
+
+.empty-state .empty-sub {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+/* ===================================================
+   AUTH PAGE LAYOUT
+   =================================================== */
+
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem 1.25rem;
+}
+
+.auth-header {
+  margin-bottom: 1.75rem;
+}
+
+.auth-header .auth-brand {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--blue);
+  margin-bottom: 0.65rem;
+}
+
+.auth-header h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.auth-header p {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-top: 0.3rem;
+}
+
+.auth-footer {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.auth-footer a {
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===================================================
+   INPUT ROW (input + mic button side by side)
+   =================================================== */
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.input-row .input-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* ===================================================
+   LOCATION CARD (saved location item)
+   =================================================== */
+
+.loc-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.loc-card .loc-btn {
+  flex: 1;
+  padding: 0.75rem 0.875rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+
+.loc-card .loc-btn:hover {
+  background: var(--off-white);
+}
+
+.loc-card .loc-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--border);
+}
+
+.loc-card .loc-delete {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger);
+  transition: background 0.1s, border-color 0.1s;
+  box-shadow: 2px 2px 0 0 var(--border-soft);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.loc-card .loc-delete:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+/* ===================================================
+   UTILITIES
+   =================================================== */
+
+.divider {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 1rem 0;
+}
+
+.text-muted { color: var(--ink-muted); }
+.text-blue  { color: var(--blue); }
+.text-sm    { font-size: 0.8rem; }
+.text-xs    { font-size: 0.72rem; }
+.fw-bold    { font-weight: 700; }
+
+/* ===================================================
+   RESPONSIVE — Tablet and Desktop
+   =================================================== */
+
+@media (min-width: 640px) {
+  html { font-size: 15px; }
+
+  .content {
+    padding-bottom: 0;
+  }
+
+  .floating-action {
+    position: static;
+    padding: 0.875rem 1.25rem;
+    border-top: 1.5px solid var(--border);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    background-color: #ECEEF2;
+  }
 }

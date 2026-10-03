@@ -1,438 +1,380 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Clock, ArrowLeft, Mic, Trash2, Plus } from 'lucide-react';
+import { MapPin, Clock, ArrowLeft, Mic, Trash2, Plus, MicOff } from 'lucide-react';
 
 export default function CreateReminder() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  
+
   const [text, setText] = useState('');
-  const [type, setType] = useState(null); // 'location' or 'time'
-  
+  const [type, setType] = useState(null);
+
   // Location state
   const [savedLocations, setSavedLocations] = useState([]);
-  const [locationView, setLocationView] = useState('list'); // 'list' | 'new'
+  const [locationView, setLocationView] = useState('list');
   const [locationName, setLocationName] = useState('');
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [locationStatus, setLocationStatus] = useState(''); // '' | 'loading' | 'success' | 'error'
-  
+
   // Time state
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
-  // Speech Recognition state
+  // Speech recognition
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
   const [recognition, setRecognition] = useState(null);
-  const activeVoiceTarget = useRef('text'); // 'text' | 'location'
+  const voiceTarget = useRef('text');
 
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const rec = new SpeechRecognition();
-      rec.continuous = true;
-      rec.interimResults = true;
-      
-      rec.onresult = (event) => {
-        let currentTranscript = '';
-        for (let i = 0; i < event.results.length; i++) {
-          currentTranscript += event.results[i][0].transcript;
-        }
-        if (activeVoiceTarget.current === 'location') {
-          setLocationName(currentTranscript);
-        } else {
-          setText(currentTranscript);
-        }
-      };
-      
-      rec.onerror = (event) => {
-        console.error('Speech recognition error', event.error);
-        setIsListening(false);
-      };
-      
-      rec.onend = () => {
-        setIsListening(false);
-      };
-      
-      setRecognition(rec);
-    } else {
-      setSpeechSupported(false);
-    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { setSpeechSupported(false); return; }
+
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+
+    rec.onresult = (e) => {
+      let t = '';
+      for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+      if (voiceTarget.current === 'location') setLocationName(t);
+      else setText(t);
+    };
+
+    rec.onerror = () => setIsListening(false);
+    rec.onend = () => setIsListening(false);
+
+    setRecognition(rec);
   }, []);
 
   function startListening(target, e) {
-    if (e && e.cancelable) e.preventDefault();
-    if (recognition && !isListening) {
-      activeVoiceTarget.current = target;
-      if (target === 'location') setLocationName('');
-      else setText('');
-      
-      setIsListening(true);
-      try {
-        recognition.start();
-      } catch (err) {
-        // Already started
-      }
-    }
+    if (e?.cancelable) e.preventDefault();
+    if (!recognition || isListening) return;
+    voiceTarget.current = target;
+    if (target === 'location') setLocationName('');
+    else setText('');
+    setIsListening(true);
+    try { recognition.start(); } catch (_) { /* already running */ }
   }
 
   function stopListening(e) {
-    if (e && e.cancelable) e.preventDefault();
-    if (recognition && isListening) {
-      setIsListening(false);
-      recognition.stop();
-    }
+    if (e?.cancelable) e.preventDefault();
+    if (!recognition || !isListening) return;
+    setIsListening(false);
+    recognition.stop();
   }
 
-  function handleNextStep() {
-    if (step === 1 && text.trim()) {
-      setStep(2);
-    } else if (step === 2 && type) {
-      setStep(3);
+  function goBack() {
+    if (step === 3 && type === 'location' && locationView === 'new' && savedLocations.length > 0) {
+      setLocationView('list');
+    } else if (step > 1) {
+      setStep(s => s - 1);
+    } else {
+      navigate('/');
     }
   }
 
   async function fetchLocations() {
     try {
-      const response = await fetch('http://localhost:5000/api/locations');
-      if (response.ok) {
-        const data = await response.json();
+      const res = await fetch('http://localhost:5000/api/locations', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
         setSavedLocations(data);
-        if (data.length === 0) setLocationView('new');
-        else setLocationView('list');
+        setLocationView(data.length === 0 ? 'new' : 'list');
       }
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (err) { console.error(err); }
   }
 
-  function handleTypeSelect(selectedType) {
-    setType(selectedType);
-    if (selectedType === 'location') {
-      fetchLocations();
-    }
+  function handleTypeSelect(t) {
+    setType(t);
+    if (t === 'location') fetchLocations();
     setStep(3);
   }
 
   function getCurrentLocation() {
     setLocationStatus('loading');
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLatitude(position.coords.latitude);
-          setLongitude(position.coords.longitude);
-          setLocationStatus('success');
-        },
-        (error) => {
-          console.error(error);
-          setLocationStatus('error');
-        }
-      );
-    } else {
-      setLocationStatus('error');
-    }
+    if (!('geolocation' in navigator)) { setLocationStatus('error'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setLatitude(pos.coords.latitude); setLongitude(pos.coords.longitude); setLocationStatus('success'); },
+      () => setLocationStatus('error')
+    );
   }
 
   async function saveReminderWithLocation(name, lat, lng) {
-    const payload = {
-      text,
-      type: 'location',
-      location: { name, latitude: lat, longitude: lng }
-    };
     try {
       await fetch('http://localhost:5000/api/reminders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        credentials: 'include',
+        body: JSON.stringify({ text, type: 'location', location: { name, latitude: lat, longitude: lng } })
       });
       navigate('/');
-    } catch (error) {
-      console.error('Error saving reminder:', error);
-    }
+    } catch (err) { console.error(err); }
   }
 
   async function handleSaveNewLocation() {
     if (!latitude || !longitude || !locationName.trim()) return;
     try {
-      const locRes = await fetch('http://localhost:5000/api/locations', {
+      const res = await fetch('http://localhost:5000/api/locations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: locationName, latitude, longitude })
       });
-      if (locRes.ok) {
-        saveReminderWithLocation(locationName, latitude, longitude);
-      }
-    } catch (error) {
-      console.error('Error saving location:', error);
-    }
+      if (res.ok) saveReminderWithLocation(locationName, latitude, longitude);
+    } catch (err) { console.error(err); }
   }
 
   async function handleDeleteLocation(id) {
     try {
-      await fetch(`http://localhost:5000/api/locations/${id}`, {
-        method: 'DELETE'
-      });
+      await fetch(`http://localhost:5000/api/locations/${id}`, { method: 'DELETE', credentials: 'include' });
       fetchLocations();
-    } catch (error) {
-      console.error('Error deleting location:', error);
-    }
+    } catch (err) { console.error(err); }
   }
 
   async function handleSaveTime() {
     if (!date || !time) return;
-    const payload = {
-      text,
-      type: 'time',
-      reminderTime: new Date(`${date}T${time}`).toISOString()
-    };
     try {
       await fetch('http://localhost:5000/api/reminders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        credentials: 'include',
+        body: JSON.stringify({ text, type: 'time', reminderTime: new Date(`${date}T${time}`).toISOString() })
       });
       navigate('/');
-    } catch (error) {
-      console.error('Error saving reminder:', error);
-    }
+    } catch (err) { console.error(err); }
   }
+
+  /* ---- Step 1 progress ---- */
+  const stepLabel = step === 1 ? 'What?' : step === 2 ? 'When?' : type === 'location' ? 'Where?' : 'Set time';
 
   return (
     <>
-      <div className="header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button className="btn-secondary" style={{ width: '40px', height: '40px', padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => step > 1 ? setStep(step - 1) : navigate('/')}>
-          <ArrowLeft size={20} />
-        </button>
-        <h1 style={{ fontSize: '1.25rem' }}>New Reminder</h1>
+      {/* Header */}
+      <div className="header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <button className="btn-icon" onClick={goBack} aria-label="Go back">
+            <ArrowLeft size={15} />
+          </button>
+          <div>
+            <p className="header-title">New Reminder</p>
+            <p className="header-user">Step {step} of 3 — {stepLabel}</p>
+          </div>
+        </div>
+        {/* Step dots */}
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[1, 2, 3].map(s => (
+            <div key={s} style={{
+              width: 8, height: 8, borderRadius: '50%',
+              background: step >= s ? 'var(--blue)' : 'var(--border-soft)',
+              border: '1.5px solid var(--border)',
+              transition: 'background 0.2s'
+            }} />
+          ))}
+        </div>
       </div>
 
+      {/* Content */}
       <div className="content">
+
+        {/* ---- STEP 1: Reminder text ---- */}
         {step === 1 && (
-          <div style={{ marginTop: '2rem' }}>
-            <label className="form-label" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-              What do you need to remember?
-            </label>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="e.g. Return library book"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              autoFocus
-            />
-            
+          <div>
+            <p className="step-question">What do you need to remember?</p>
+
+            <div className="form-group">
+              <label className="form-label">Reminder</label>
+              <input
+                type="text"
+                className="input-field"
+                placeholder="e.g. Return library book"
+                value={text}
+                onChange={e => setText(e.target.value)}
+                autoFocus
+              />
+            </div>
+
             {speechSupported ? (
-              <div style={{ marginTop: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className="mic-wrap">
                 <button
-                  type="button"
-                  onMouseDown={(e) => startListening('text', e)}
+                  className={`mic-btn ${isListening && voiceTarget.current === 'text' ? 'listening' : ''}`}
+                  onMouseDown={e => startListening('text', e)}
                   onMouseUp={stopListening}
                   onMouseLeave={stopListening}
-                  onTouchStart={(e) => startListening('text', e)}
+                  onTouchStart={e => startListening('text', e)}
                   onTouchEnd={stopListening}
-                  className={`btn ${isListening && activeVoiceTarget.current === 'text' ? 'btn-danger' : 'btn-primary'}`}
-                  style={{ 
-                    width: '100px', 
-                    height: '100px', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    boxShadow: isListening && activeVoiceTarget.current === 'text' ? '0 0 25px rgba(239, 68, 68, 0.6)' : '0 4px 12px rgba(37, 99, 235, 0.3)',
-                    transition: 'all 0.2s',
-                    transform: isListening && activeVoiceTarget.current === 'text' ? 'scale(1.05)' : 'scale(1)',
-                    touchAction: 'none'
-                  }}
+                  aria-label="Hold to speak reminder"
                 >
-                  <Mic size={48} color="white" />
+                  <Mic size={26} />
                 </button>
-                <p style={{ marginTop: '1.5rem', color: isListening && activeVoiceTarget.current === 'text' ? 'var(--danger-color)' : 'var(--text-muted)', fontWeight: isListening && activeVoiceTarget.current === 'text' ? 'bold' : 'normal' }}>
-                  {isListening && activeVoiceTarget.current === 'text' ? 'Listening...' : 'Press and hold to speak'}
-                </p>
+                <span className={`mic-hint ${isListening && voiceTarget.current === 'text' ? 'active' : ''}`}>
+                  {isListening && voiceTarget.current === 'text' ? 'Listening…' : 'Hold to speak'}
+                </span>
               </div>
             ) : (
-              <p style={{ marginTop: '2rem', color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center' }}>
-                Voice capture is unavailable in this browser.
+              <p className="text-xs text-muted" style={{ textAlign: 'center', marginTop: '1rem' }}>
+                Voice input is not supported in this browser.
               </p>
             )}
           </div>
         )}
 
+        {/* ---- STEP 2: Choose type ---- */}
         {step === 2 && (
-          <div style={{ marginTop: '2rem' }}>
-            <label className="form-label" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-              When should LocReminder remind you?
-            </label>
+          <div>
+            <p className="step-question">When should I remind you?</p>
+
             <div className="choice-grid">
               <button className="choice-btn" onClick={() => handleTypeSelect('location')}>
-                <MapPin size={24} /> WHEN I'M THERE
+                <span className="choice-icon"><MapPin size={16} /></span>
+                <div>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>When I'm there</p>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', fontWeight: 500 }}>Trigger by location</p>
+                </div>
               </button>
               <button className="choice-btn" onClick={() => handleTypeSelect('time')}>
-                <Clock size={24} /> AT A SPECIFIC TIME
+                <span className="choice-icon"><Clock size={16} /></span>
+                <div>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>At a specific time</p>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', fontWeight: 500 }}>Pick a date and time</p>
+                </div>
               </button>
             </div>
           </div>
         )}
 
+        {/* ---- STEP 3: Location list ---- */}
         {step === 3 && type === 'location' && locationView === 'list' && (
-          <div style={{ marginTop: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
-              <label className="form-label" style={{ fontSize: '1.5rem', margin: 0 }}>
-                Where should I remember this?
-              </label>
-            </div>
-            
-            <div className="choice-grid">
+          <div>
+            <p className="step-question">Where should I remind you?</p>
+            <p className="section-label">Saved locations</p>
+
+            <div>
               {savedLocations.map(loc => (
-                <div key={loc._id} style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button 
-                    className="choice-btn" 
-                    style={{ flex: 1, justifyContent: 'flex-start' }} 
-                    onClick={() => saveReminderWithLocation(loc.name, loc.latitude, loc.longitude)}
-                  >
-                    <MapPin size={24} /> {loc.name}
+                <div key={loc._id} className="loc-card">
+                  <button className="loc-btn" onClick={() => saveReminderWithLocation(loc.name, loc.latitude, loc.longitude)}>
+                    <MapPin size={15} color="var(--blue)" />
+                    {loc.name}
                   </button>
-                  <button 
-                    className="btn-secondary" 
-                    style={{ padding: '0 1.25rem', borderRadius: '16px' }} 
-                    onClick={() => handleDeleteLocation(loc._id)}
-                  >
-                    <Trash2 size={20} color="var(--danger-color)" />
+                  <button className="loc-delete" onClick={() => handleDeleteLocation(loc._id)} aria-label={`Delete ${loc.name}`}>
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
-              
-              <button className="choice-btn" style={{ borderStyle: 'dashed' }} onClick={() => setLocationView('new')}>
-                <Plus size={24} /> Add new location
+
+              <button className="choice-btn dashed" style={{ marginTop: '0.25rem' }} onClick={() => setLocationView('new')}>
+                <Plus size={16} /> Add new location
               </button>
             </div>
           </div>
         )}
 
+        {/* ---- STEP 3: New location form ---- */}
         {step === 3 && type === 'location' && locationView === 'new' && (
-          <div style={{ marginTop: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
-              <button className="btn-secondary" style={{ width: '40px', height: '40px', padding: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setLocationView('list')}>
-                <ArrowLeft size={20} />
-              </button>
-              <label className="form-label" style={{ fontSize: '1.5rem', margin: 0 }}>
-                New Location
-              </label>
-            </div>
-            
+          <div>
+            <p className="step-question">New location</p>
+
             <div className="form-group">
               <label className="form-label">Location name</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="text" 
-                  className="input-field" 
-                  style={{ marginBottom: 0 }}
+              <div className="input-row">
+                <input
+                  type="text"
+                  className="input-field"
                   placeholder="e.g. VIT Library"
                   value={locationName}
-                  onChange={(e) => setLocationName(e.target.value)}
+                  onChange={e => setLocationName(e.target.value)}
                 />
                 {speechSupported && (
                   <button
-                    type="button"
-                    onMouseDown={(e) => startListening('location', e)}
+                    className={`mic-inline ${isListening && voiceTarget.current === 'location' ? 'listening' : ''}`}
+                    onMouseDown={e => startListening('location', e)}
                     onMouseUp={stopListening}
                     onMouseLeave={stopListening}
-                    onTouchStart={(e) => startListening('location', e)}
+                    onTouchStart={e => startListening('location', e)}
                     onTouchEnd={stopListening}
-                    className={`btn ${isListening && activeVoiceTarget.current === 'location' ? 'btn-danger' : 'btn-secondary'}`}
-                    style={{ 
-                      width: '56px', 
-                      height: '56px', 
-                      borderRadius: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: 0,
-                      touchAction: 'none'
-                    }}
+                    aria-label="Hold to speak location name"
                   >
-                    <Mic size={24} color={isListening && activeVoiceTarget.current === 'location' ? 'white' : 'var(--accent-color)'} />
+                    <Mic size={17} />
                   </button>
                 )}
               </div>
+              {isListening && voiceTarget.current === 'location' && (
+                <p className="text-xs" style={{ color: 'var(--blue)', marginTop: '0.35rem', fontWeight: 600 }}>Listening…</p>
+              )}
             </div>
 
-            <div className="form-group" style={{ marginTop: '2rem' }}>
+            <div className="form-group">
+              <label className="form-label">GPS coordinates</label>
               {locationStatus === 'success' ? (
-                <div style={{ padding: '1rem', background: '#d1fae5', color: '#065f46', borderRadius: '12px', textAlign: 'center', fontWeight: 'bold' }}>
-                  ✓ Location captured
-                </div>
+                <div className="status-box success">✓ Location captured successfully</div>
               ) : (
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  className="btn"
                   onClick={getCurrentLocation}
                   disabled={locationStatus === 'loading'}
+                  style={{ justifyContent: 'center', gap: '0.5rem' }}
                 >
-                  <MapPin size={20} style={{ marginRight: '8px' }} />
-                  {locationStatus === 'loading' ? 'Getting location...' : 'Use my current location'}
+                  <MapPin size={15} />
+                  {locationStatus === 'loading' ? 'Getting location…' : 'Use my current location'}
                 </button>
               )}
               {locationStatus === 'error' && (
-                <div style={{ color: 'var(--danger-color)', marginTop: '0.5rem', textAlign: 'center' }}>
-                  Could not get location. Make sure permissions are granted.
+                <div className="status-box error" style={{ marginTop: '0.5rem' }}>
+                  Couldn't get your location. Check location permissions and try again.
                 </div>
               )}
             </div>
           </div>
         )}
 
+        {/* ---- STEP 3: Time ---- */}
         {step === 3 && type === 'time' && (
-          <div style={{ marginTop: '2rem' }}>
-            <label className="form-label" style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
-              When?
-            </label>
-            
-            <div className="form-group">
-              <label className="form-label">Date</label>
-              <input 
-                type="date" 
-                className="input-field" 
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
+          <div>
+            <p className="step-question">When exactly?</p>
 
             <div className="form-group">
+              <label className="form-label">Date</label>
+              <input
+                type="date"
+                className="input-field"
+                value={date}
+                onChange={e => setDate(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
               <label className="form-label">Time</label>
-              <input 
-                type="time" 
-                className="input-field" 
+              <input
+                type="time"
+                className="input-field"
                 value={time}
-                onChange={(e) => setTime(e.target.value)}
+                onChange={e => setTime(e.target.value)}
               />
             </div>
           </div>
         )}
+
       </div>
 
+      {/* Bottom action */}
       <div className="floating-action">
         {step === 1 && (
-          <button className="btn btn-primary" onClick={handleNextStep} disabled={!text.trim()}>
-            NEXT
+          <button className="btn btn-primary" onClick={() => text.trim() && setStep(2)} disabled={!text.trim()}>
+            Continue
           </button>
         )}
         {step === 3 && type === 'location' && locationView === 'new' && (
-          <button 
-            className="btn btn-primary" 
-            onClick={handleSaveNewLocation} 
+          <button
+            className="btn btn-primary"
+            onClick={handleSaveNewLocation}
             disabled={!locationName.trim() || locationStatus !== 'success'}
           >
-            SAVE LOCATION
+            Save location &amp; reminder
           </button>
         )}
         {step === 3 && type === 'time' && (
-          <button 
-            className="btn btn-primary" 
-            onClick={handleSaveTime} 
-            disabled={!date || !time}
-          >
-            SAVE
+          <button className="btn btn-primary" onClick={handleSaveTime} disabled={!date || !time}>
+            Save reminder
           </button>
         )}
       </div>

@@ -1,19 +1,24 @@
 const express = require('express');
 const Location = require('../models/Location');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
-        const locations = await Location.find().sort({ createdAt: -1 });
+        const locations = await Location.find({ userId: req.userId }).sort({ createdAt: -1 });
         res.json(locations);
     } catch (err) {
         res.status(500).json({ error: 'Server Error' });
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
-        const newLocation = new Location(req.body);
+        const locationData = {
+            ...req.body,
+            userId: req.userId
+        };
+        const newLocation = new Location(locationData);
         const savedLocation = await newLocation.save();
         res.status(201).json(savedLocation);
     } catch (err) {
@@ -21,9 +26,12 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
-        await Location.findByIdAndDelete(req.params.id);
+        const deletedLocation = await Location.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+        if (!deletedLocation) {
+            return res.status(404).json({ error: 'Location not found or unauthorized' });
+        }
         res.json({ message: 'Location deleted' });
     } catch (err) {
         res.status(500).json({ error: 'Delete failed' });

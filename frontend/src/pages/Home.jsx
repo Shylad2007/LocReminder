@@ -1,79 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, CheckCircle2, Trash2, Plus } from 'lucide-react';
+import { MapPin, Clock, Check, Trash2, Plus, LogOut, Bell } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Home() {
   const [reminders, setReminders] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const { logout, user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchReminders();
-    startLocationTracking();
-  }, []);
+    if (user) {
+      fetchReminders();
+      startLocationTracking();
+    }
+  }, [user]);
 
   async function fetchReminders() {
     try {
-      const response = await fetch('http://localhost:5000/api/reminders');
-      if (response.ok) {
-        const data = await response.json();
-        setReminders(data);
-      }
-    } catch (error) {
-      console.error('Error fetching reminders:', error);
+      const res = await fetch('http://localhost:5000/api/reminders', { credentials: 'include' });
+      if (res.ok) setReminders(await res.json());
+    } catch (err) {
+      console.error('Error fetching reminders:', err);
     }
   }
 
   function startLocationTracking() {
     if ('geolocation' in navigator) {
       navigator.geolocation.watchPosition(
-        (position) => {
-          setCurrentLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (error) => console.error('Location error:', error),
+        (pos) => setCurrentLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+        (err) => console.error('Location error:', err),
         { enableHighAccuracy: true }
       );
     }
   }
 
-  function calculateDistance(lat1, lon1, lat2, lon2) {
+  function calcDistance(lat1, lon1, lat2, lon2) {
     if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
-    
-    const R = 6371e3; // metres
-    const φ1 = lat1 * Math.PI/180; // φ, λ in radians
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lon2-lon1) * Math.PI/180;
-
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c; // in metres
+    const R = 6371e3;
+    const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
+    const dp = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
-  function isReminderDue(reminder) {
-    if (reminder.completed) return false;
-    
-    if (reminder.type === 'location') {
+  function isReminderDue(r) {
+    if (r.completed) return false;
+    if (r.type === 'location') {
       if (!currentLocation) return false;
-      const distance = calculateDistance(
-        currentLocation.latitude,
-        currentLocation.longitude,
-        reminder.location.latitude,
-        reminder.location.longitude
-      );
-      // Assuming within 100 meters is "due"
-      return distance <= 100;
-    } else if (reminder.type === 'time') {
-      const now = new Date();
-      const reminderTime = new Date(reminder.reminderTime);
-      return now >= reminderTime;
+      return calcDistance(currentLocation.latitude, currentLocation.longitude, r.location.latitude, r.location.longitude) <= 100;
     }
-    
+    if (r.type === 'time') return new Date() >= new Date(r.reminderTime);
     return false;
   }
 
@@ -82,86 +58,99 @@ export default function Home() {
       await fetch(`http://localhost:5000/api/reminders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ completed: true })
       });
       fetchReminders();
-    } catch (error) {
-      console.error('Error updating:', error);
-    }
+    } catch (err) { console.error(err); }
   }
 
   async function deleteReminder(id) {
     try {
-      await fetch(`http://localhost:5000/api/reminders/${id}`, {
-        method: 'DELETE'
-      });
+      await fetch(`http://localhost:5000/api/reminders/${id}`, { method: 'DELETE', credentials: 'include' });
       fetchReminders();
-    } catch (error) {
-      console.error('Error deleting:', error);
-    }
+    } catch (err) { console.error(err); }
   }
 
-  const activeReminders = reminders.filter(r => !r.completed);
+  const active = reminders.filter(r => !r.completed);
 
   return (
     <>
+      {/* Header */}
       <div className="header">
-        <h1>LocReminder</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Things waiting for you</p>
+        <div className="header-brand">
+          <span className="brand-name">LocReminder</span>
+          <span className="brand-tagline">Remember it when you're there</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', fontWeight: 600, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {user?.name}
+          </span>
+          <button className="btn-icon" onClick={logout} title="Log out" aria-label="Log out">
+            <LogOut size={15} />
+          </button>
+        </div>
       </div>
-      
+
+      {/* Content */}
       <div className="content">
-        {activeReminders.length === 0 ? (
+        {active.length === 0 ? (
           <div className="empty-state">
-            <p>Nothing waiting.</p>
-            <p>Got something to remember?</p>
+            <div className="empty-icon"><Bell size={20} /></div>
+            <p className="empty-title">No reminders yet</p>
+            <p className="empty-sub">Create your first reminder below.</p>
           </div>
         ) : (
-          activeReminders.map(reminder => {
-            const due = isReminderDue(reminder);
-            
-            return (
-              <div key={reminder._id} className="card" style={due ? { borderColor: 'var(--accent-color)', boxShadow: '0 4px 12px rgba(37,99,235,0.1)' } : {}}>
-                <div className="card-header">{reminder.text}</div>
-                <div className="card-body">
-                  {reminder.type === 'location' ? (
-                    <>
-                      <MapPin size={18} />
-                      <span>{reminder.location?.name || 'Saved Location'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Clock size={18} />
-                      <span>
-                        {new Date(reminder.reminderTime).toLocaleDateString()} · {new Date(reminder.reminderTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </>
+          <>
+            <p className="section-label" style={{ marginBottom: '0.75rem' }}>Your reminders</p>
+            {active.map(r => {
+              const due = isReminderDue(r);
+              return (
+                <div key={r._id} className={`card ${due ? 'card-active' : ''}`}>
+                  {due && (
+                    <div className="card-due-banner">
+                      {r.type === 'location' ? <MapPin size={12} /> : <Clock size={12} />}
+                      {r.type === 'location' ? "You're here!" : "It's time!"}
+                    </div>
                   )}
-                </div>
-                
-                {due && (
-                  <div style={{ marginBottom: '1rem', color: 'var(--accent-color)', fontWeight: 'bold' }}>
-                    {reminder.type === 'location' ? "📍 You're here!" : "🕐 It's time!"}
+
+                  <p className="card-badge">
+                    {r.type === 'location' ? <><MapPin size={11} /> Location</> : <><Clock size={11} /> Time</>}
+                  </p>
+
+                  <p className="card-title">{r.text}</p>
+
+                  <p className="card-meta">
+                    {r.type === 'location'
+                      ? <>{r.location?.name || 'Saved location'}</>
+                      : <>{new Date(r.reminderTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · {new Date(r.reminderTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</>
+                    }
+                  </p>
+
+                  <div className="card-actions">
+                    <button className="btn btn-success" onClick={() => markComplete(r._id)}>
+                      <Check size={14} /> Done
+                    </button>
+                    <button
+                      className="btn"
+                      style={{ width: 'auto', padding: '0.5rem 0.75rem', color: 'var(--danger)', borderColor: 'var(--border-soft)', boxShadow: '2px 2px 0 0 var(--border-soft)' }}
+                      onClick={() => deleteReminder(r._id)}
+                      aria-label="Delete reminder"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
-                )}
-                
-                <div className="card-actions">
-                  <button className="btn btn-success" onClick={() => markComplete(reminder._id)}>
-                    <CheckCircle2 size={20} style={{ marginRight: '8px' }} /> Done
-                  </button>
-                  <button className="btn btn-secondary" style={{ width: 'auto' }} onClick={() => deleteReminder(reminder._id)}>
-                    <Trash2 size={20} />
-                  </button>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </>
         )}
       </div>
 
+      {/* Floating action */}
       <div className="floating-action">
         <Link to="/create" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-          <Plus size={24} style={{ marginRight: '8px' }} /> REMEMBER SOMETHING
+          <Plus size={16} /> New Reminder
         </Link>
       </div>
     </>
