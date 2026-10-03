@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
 
     async function fetchUser() {
         try {
-            const res = await fetch('http://localhost:5000/api/auth/me', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
                 credentials: 'include' // We will use include
             });
             if (res.ok) {
@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
 
     const logout = async () => {
         try {
-            await fetch('http://localhost:5000/api/auth/logout', {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
                 method: 'POST',
                 credentials: 'include'
             });

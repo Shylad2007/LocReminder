@@ -77,7 +77,7 @@ export default function CreateReminder() {
 
   async function fetchLocations() {
     try {
-      const res = await fetch('http://localhost:5000/api/locations', { credentials: 'include' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/locations`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setSavedLocations(data);
@@ -103,7 +103,7 @@ export default function CreateReminder() {
 
   async function saveReminderWithLocation(name, lat, lng) {
     try {
-      await fetch('http://localhost:5000/api/reminders', {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/reminders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -116,7 +116,7 @@ export default function CreateReminder() {
   async function handleSaveNewLocation() {
     if (!latitude || !longitude || !locationName.trim()) return;
     try {
-      const res = await fetch('http://localhost:5000/api/locations', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/locations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -128,7 +128,7 @@ export default function CreateReminder() {
 
   async function handleDeleteLocation(id) {
     try {
-      await fetch(`http://localhost:5000/api/locations/${id}`, { method: 'DELETE', credentials: 'include' });
+      await fetch(`${import.meta.env.VITE_API_URL}/api/locations/${id}`, { method: 'DELETE', credentials: 'include' });
       fetchLocations();
     } catch (err) { console.error(err); }
   }
@@ -136,7 +136,7 @@ export default function CreateReminder() {
   async function handleSaveTime() {
     if (!date || !time) return;
     try {
-      await fetch('http://localhost:5000/api/reminders', {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/reminders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

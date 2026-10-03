@@ -17,7 +17,7 @@ export default function Home() {
 
   async function fetchReminders() {
     try {
-      const res = await fetch('http://localhost:5000/api/reminders', { credentials: 'include' });
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reminders`, { credentials: 'include' });
       if (res.ok) setReminders(await res.json());
     } catch (err) {
       console.error('Error fetching reminders:', err);
@@ -55,7 +55,7 @@ export default function Home() {
 
   async function markComplete(id) {
     try {
-      await fetch(`http://localhost:5000/api/reminders/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/reminders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -67,7 +67,7 @@ export default function Home() {
 
   async function deleteReminder(id) {
     try {
-      await fetch(`http://localhost:5000/api/reminders/${id}`, { method: 'DELETE', credentials: 'include' });
+      await fetch(`${import.meta.env.VITE_API_URL}/api/reminders/${id}`, { method: 'DELETE', credentials: 'include' });
       fetchReminders();
     } catch (err) { console.error(err); }
   }
