@@ -1,47 +1,48 @@
 /* ===================================================
    LOCREMINDER — PLINTH DESIGN SYSTEM
    Space Grotesk + Inter · 2px ink outline · 12px radius
-   Blue + White + Black · Tactile · Medium-density
+   Blue + White + Black · Tactile · Consumer-grade
    =================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* --- Design tokens (Plinth spec) --- */
+/* --- Design tokens --- */
 :root {
-  /* Palette */
-  --canvas:      #FFFFFF;
-  --paper:       #FAF7F2;
-  --ink:         #111111;
-  --ink-muted:   #666666;
-  --border:      #111111;
-  --border-soft: #E2DDD7;
-  --blue:        #2A5BFF;
-  --blue-light:  #EBF0FF;
-  --blue-hover:  #1A4AEF;
-  --danger:      #D93025;
-  --danger-bg:   #FEECEA;
-  --success:     #1A7A4A;
-  --success-bg:  #D4F5E2;
+  --canvas:       #FFFFFF;
+  --paper:        #FAF7F2;
+  --paper-dark:   #F0EBE3;
+  --ink:          #111111;
+  --ink-muted:    #666666;
+  --ink-faint:    #999999;
+  --border:       #111111;
+  --border-soft:  #E2DDD7;
+  --blue:         #2A5BFF;
+  --blue-light:   #EBF0FF;
+  --blue-mid:     #D0DCFF;
+  --blue-hover:   #1A4AEF;
+  --blue-dark:    #0F3ACC;
+  --danger:       #D93025;
+  --danger-bg:    #FEECEA;
+  --success:      #1A7A4A;
+  --success-bg:   #D4F5E2;
 
-  /* Plinth press primitive — REST·4 HOVER·6 PRESS·0 */
+  /* Press primitive: REST·4  HOVER·6  PRESS·0 */
   --shadow-rest:  4px 4px 0 0 var(--ink);
   --shadow-hover: 6px 6px 0 0 var(--ink);
   --shadow-card:  4px 4px 0 0 var(--ink);
+  --shadow-blue:  4px 4px 0 0 var(--blue-dark);
 
-  /* Geometry */
   --radius:    12px;
   --radius-sm: 8px;
+  --radius-xs: 6px;
   --border-w:  2px;
 }
 
 /* --- Reset --- */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; } /* 16px base prevents iOS auto-zoom on 1em inputs */
+/* 16px base — prevents iOS Safari auto-zoom on 1rem inputs */
+html { font-size: 16px; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -51,21 +52,17 @@ body {
   line-height: 1.5;
 }
 
-/* Display / heading font */
 h1, h2, h3,
-.brand-name,
-.step-question,
-.auth-header h1,
-.empty-title {
+.brand-name, .step-question, .auth-header h1,
+.empty-title, .hero-title {
   font-family: 'Space Grotesk', 'Inter', sans-serif;
 }
 
-/* --- Root shell --- */
-#root {
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-}
+/* ===================================================
+   SHELL
+   =================================================== */
+
+#root { display: flex; justify-content: center; min-height: 100vh; }
 
 .app-container {
   width: 100%;
@@ -89,11 +86,11 @@ h1, h2, h3,
 }
 
 @media (min-width: 1024px) {
-  body { background-color: #EDE9E1; }
+  body { background-color: #DDD8CF; }
 }
 
 /* ===================================================
-   HEADER / TOP BAR
+   HEADER
    =================================================== */
 
 .header {
@@ -109,16 +106,12 @@ h1, h2, h3,
   gap: 0.75rem;
 }
 
-.header-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.header-brand { display: flex; flex-direction: column; gap: 2px; }
 
 .header-brand .brand-name {
   font-size: 1rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: var(--ink);
   line-height: 1;
 }
@@ -127,7 +120,7 @@ h1, h2, h3,
   font-size: 0.625rem;
   font-weight: 500;
   color: var(--ink-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   font-family: 'Inter', sans-serif;
 }
@@ -144,30 +137,69 @@ h1, h2, h3,
   color: var(--ink-muted);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   font-family: 'Inter', sans-serif;
 }
 
-/* --- Scrollable content area --- */
+/* ===================================================
+   HERO SECTION (Home page top area)
+   =================================================== */
+
+.hero {
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: var(--border-w) solid var(--border);
+  background: var(--paper);
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+  margin-bottom: 0.625rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.hero-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 0.375rem;
+}
+
+.hero-sub {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ===================================================
+   CONTENT AREA
+   =================================================== */
+
 .content {
   flex: 1;
   padding: 1.25rem;
   overflow-y: auto;
-  /* Extra bottom padding so floating action never covers content */
   padding-bottom: 96px;
 }
 
 /* ===================================================
-   BUTTON SYSTEM — Plinth Press Primitive
-   REST·4  HOVER·6  PRESS·0 + translate(4,4)
+   BUTTON SYSTEM — REST·4  HOVER·6  PRESS·0
    =================================================== */
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  /* 48px min height for thumb reachability */
+  gap: 0.45rem;
   min-height: 48px;
   padding: 0.625rem 1.1rem;
   border-radius: var(--radius-sm);
@@ -188,41 +220,40 @@ h1, h2, h3,
 }
 
 .btn:disabled {
-  opacity: 0.38;
+  opacity: 0.35;
   cursor: not-allowed;
   box-shadow: 1px 1px 0 0 var(--border);
   pointer-events: none;
 }
 
-/* HOVER: lift to 6px */
 .btn:not(:disabled):hover {
   box-shadow: var(--shadow-hover);
   transform: translate(-1px, -1px);
 }
 
-/* PRESS: snap to 0px */
 .btn:not(:disabled):active {
   transform: translate(4px, 4px);
   box-shadow: 0 0 0 0 var(--border);
 }
 
-/* Primary (blue) */
+/* Primary — blue with matching dark shadow */
 .btn-primary {
   background: var(--blue);
   color: var(--canvas);
   border-color: var(--border);
+  box-shadow: var(--shadow-blue);
 }
 
 .btn-primary:not(:disabled):hover {
   background: var(--blue-hover);
-  box-shadow: var(--shadow-hover);
+  box-shadow: 6px 6px 0 0 var(--blue-dark);
   transform: translate(-1px, -1px);
 }
 
 .btn-primary:not(:disabled):active {
   background: var(--blue-hover);
   transform: translate(4px, 4px);
-  box-shadow: 0 0 0 0 var(--border);
+  box-shadow: 0 0 0 0 var(--blue-dark);
 }
 
 /* Success */
@@ -257,18 +288,11 @@ h1, h2, h3,
   user-select: none;
 }
 
-.btn-icon:hover {
-  box-shadow: 4px 4px 0 0 var(--border);
-  transform: translate(-1px, -1px);
-}
-
-.btn-icon:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 0 var(--border);
-}
+.btn-icon:hover { box-shadow: 4px 4px 0 0 var(--border); transform: translate(-1px, -1px); }
+.btn-icon:active { transform: translate(3px, 3px); box-shadow: 0 0 0 0 var(--border); }
 
 /* ===================================================
-   FLOATING ACTION AREA (sticky bottom CTA)
+   FLOATING ACTION (sticky bottom CTA)
    =================================================== */
 
 .floating-action {
@@ -277,7 +301,6 @@ h1, h2, h3,
   left: 0;
   right: 0;
   padding: 0.875rem 1.25rem;
-  /* Safe area for iPhone home indicator */
   padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
   background: var(--canvas);
   border-top: var(--border-w) solid var(--border);
@@ -295,6 +318,20 @@ h1, h2, h3,
   margin-bottom: 0.75rem;
   box-shadow: var(--shadow-card);
   transition: box-shadow 0.12s, border-color 0.12s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle left accent stripe on regular cards */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--border-soft);
+  border-radius: 0;
 }
 
 .card.card-active {
@@ -303,7 +340,29 @@ h1, h2, h3,
   background: #FAFCFF;
 }
 
-/* Compact badge above title */
+.card.card-active::before {
+  background: var(--blue);
+}
+
+/* Due-now banner — prominent alert row */
+.card-due-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--canvas);
+  background: var(--blue);
+  border: var(--border-w) solid var(--blue-dark);
+  border-radius: var(--radius-xs);
+  padding: 0.25rem 0.625rem;
+  margin-bottom: 0.625rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Type pill badge */
 .card-badge {
   display: inline-flex;
   align-items: center;
@@ -313,19 +372,15 @@ h1, h2, h3,
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-muted);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
   font-family: 'Inter', sans-serif;
-}
-
-.card-badge.badge-blue {
-  color: var(--blue);
 }
 
 .card-title {
   font-size: 1rem;
   font-weight: 700;
   color: var(--ink);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
   line-height: 1.3;
   font-family: 'Space Grotesk', sans-serif;
 }
@@ -337,19 +392,6 @@ h1, h2, h3,
   align-items: center;
   gap: 0.35rem;
   margin-bottom: 0.875rem;
-  font-family: 'Inter', sans-serif;
-}
-
-.card-due-banner {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  color: var(--blue);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
   font-family: 'Inter', sans-serif;
 }
 
@@ -370,33 +412,25 @@ h1, h2, h3,
    FORM ELEMENTS
    =================================================== */
 
-.form-group {
-  margin-bottom: 1.125rem;
-}
+.form-group { margin-bottom: 1.125rem; }
 
 .form-label {
   display: block;
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   color: var(--ink-muted);
   margin-bottom: 0.4rem;
   font-family: 'Inter', sans-serif;
 }
 
-/*
-  REQUIRED FIX #1 — PREVENT iOS AUTO-ZOOM
-  iOS Safari zooms when an input's font-size < 16px.
-  Base is now 16px, so 1rem = 16px exactly.
-  All inputs use font-size: 1rem to guarantee no auto-zoom.
-*/
+/* FIX: font-size >= 16px (1rem at 16px base) prevents iOS Safari auto-zoom */
 .input-field {
   width: 100%;
   padding: 0.6875rem 0.875rem;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius-sm);
-  /* Must be >= 16px (1rem at base 16px) to prevent iOS Safari auto-zoom */
   font-size: 1rem;
   font-weight: 500;
   color: var(--ink);
@@ -404,7 +438,6 @@ h1, h2, h3,
   transition: border-color 0.12s, box-shadow 0.12s;
   outline: none;
   font-family: 'Inter', sans-serif;
-  /* Ensure minimum touch target height */
   min-height: 48px;
 }
 
@@ -413,20 +446,13 @@ h1, h2, h3,
   box-shadow: 0 0 0 3px var(--blue-light);
 }
 
-.input-field::placeholder {
-  color: #AAAAAA;
-  font-weight: 400;
-}
+.input-field::placeholder { color: #BBBBBB; font-weight: 400; }
 
-/* Date/time inputs: force same sizing */
 input[type="date"].input-field,
-input[type="time"].input-field {
-  font-size: 1rem;
-  min-height: 48px;
-}
+input[type="time"].input-field { font-size: 1rem; min-height: 48px; }
 
 /* ===================================================
-   SECTION LABEL (uppercase divider with rule)
+   SECTION LABEL
    =================================================== */
 
 .section-label {
@@ -464,19 +490,14 @@ input[type="time"].input-field {
 }
 
 /* ===================================================
-   CHOICE BUTTONS
+   CHOICE BUTTONS (location / time type)
    =================================================== */
 
-.choice-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
+.choice-grid { display: flex; flex-direction: column; gap: 0.625rem; }
 
 .choice-btn {
   width: 100%;
-  /* 56px keeps them thumb-friendly without being oversized */
-  min-height: 56px;
+  min-height: 60px;
   padding: 0.875rem 1rem;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
@@ -488,7 +509,7 @@ input[type="time"].input-field {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   box-shadow: var(--shadow-rest);
   transition: transform 0.08s, box-shadow 0.08s, background 0.08s;
   -webkit-tap-highlight-color: transparent;
@@ -496,15 +517,8 @@ input[type="time"].input-field {
   font-family: 'Inter', sans-serif;
 }
 
-.choice-btn:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translate(-1px, -1px);
-}
-
-.choice-btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 0 var(--border);
-}
+.choice-btn:hover { box-shadow: var(--shadow-hover); transform: translate(-1px, -1px); }
+.choice-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 0 var(--border); }
 
 .choice-btn.active {
   background: var(--blue-light);
@@ -520,15 +534,11 @@ input[type="time"].input-field {
   min-height: 48px;
 }
 
-.choice-btn.dashed:hover {
-  box-shadow: none;
-  transform: none;
-  background: var(--paper);
-}
+.choice-btn.dashed:hover { box-shadow: none; transform: none; background: var(--paper); }
 
 .choice-btn .choice-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius-sm);
   background: var(--paper);
   border: var(--border-w) solid var(--border-soft);
@@ -546,7 +556,8 @@ input[type="time"].input-field {
 
 /* ===================================================
    VOICE / MIC BUTTON
-   REQUIRED FIX #2 — PREVENT TEXT SELECTION ON HOLD
+   - user-select/touch-callout none prevents text
+     selection when holding on mobile (Fix #2)
    =================================================== */
 
 .mic-wrap {
@@ -576,16 +587,12 @@ input[type="time"].input-field {
   color: var(--ink);
   -webkit-tap-highlight-color: transparent;
   touch-action: none;
-  /* FIX #2: prevent text/icon selection on long-press hold */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-.mic-btn:hover {
-  box-shadow: 6px 6px 0 0 var(--border);
-  transform: translate(-1px, -1px);
-}
+.mic-btn:hover { box-shadow: 6px 6px 0 0 var(--border); transform: translate(-1px, -1px); }
 
 .mic-btn:active,
 .mic-btn.listening {
@@ -596,7 +603,6 @@ input[type="time"].input-field {
   color: var(--canvas);
 }
 
-/* Prevent icon inside mic-btn from being selectable */
 .mic-btn svg,
 .mic-inline svg {
   pointer-events: none;
@@ -611,16 +617,13 @@ input[type="time"].input-field {
   letter-spacing: 0.08em;
   color: var(--ink-muted);
   font-family: 'Inter', sans-serif;
-  /* Prevent hint text from being drag-selected during hold */
   user-select: none;
   -webkit-user-select: none;
 }
 
-.mic-hint.active {
-  color: var(--blue);
-}
+.mic-hint.active { color: var(--blue); }
 
-/* Inline mic (inside input row) */
+/* Inline mic */
 .mic-inline {
   width: 48px;
   height: 48px;
@@ -637,16 +640,12 @@ input[type="time"].input-field {
   color: var(--ink);
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
-  /* FIX #2: prevent selection on long-press */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-.mic-inline:hover {
-  box-shadow: 5px 5px 0 0 var(--border);
-  transform: translate(-1px, -1px);
-}
+.mic-inline:hover { box-shadow: 5px 5px 0 0 var(--border); transform: translate(-1px, -1px); }
 
 .mic-inline:active,
 .mic-inline.listening {
@@ -670,23 +669,9 @@ input[type="time"].input-field {
   font-family: 'Inter', sans-serif;
 }
 
-.status-box.success {
-  background: var(--success-bg);
-  color: var(--success);
-  border-color: var(--success);
-}
-
-.status-box.error {
-  background: var(--danger-bg);
-  color: var(--danger);
-  border-color: var(--danger);
-}
-
-.status-box.info {
-  background: var(--blue-light);
-  color: var(--blue);
-  border-color: var(--blue);
-}
+.status-box.success { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.status-box.error   { background: var(--danger-bg);  color: var(--danger);  border-color: var(--danger);  }
+.status-box.info    { background: var(--blue-light);  color: var(--blue);    border-color: var(--blue);    }
 
 /* ===================================================
    ERROR BANNER
@@ -713,29 +698,29 @@ input[type="time"].input-field {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 3rem 1.5rem;
-  gap: 0.4rem;
-  color: var(--ink-muted);
+  padding: 3rem 1.5rem 2rem;
+  gap: 0.35rem;
 }
 
 .empty-state .empty-icon {
-  width: 48px;
-  height: 48px;
-  border: var(--border-w) solid var(--border-soft);
+  width: 52px;
+  height: 52px;
+  border: var(--border-w) solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.875rem;
   color: var(--ink-muted);
   background: var(--paper);
+  box-shadow: 3px 3px 0 0 var(--border-soft);
 }
 
 .empty-state .empty-title {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   color: var(--ink);
   font-family: 'Space Grotesk', sans-serif;
 }
@@ -745,10 +730,11 @@ input[type="time"].input-field {
   color: var(--ink-muted);
   margin-bottom: 1rem;
   font-family: 'Inter', sans-serif;
+  line-height: 1.5;
 }
 
 /* ===================================================
-   AUTH PAGE LAYOUT
+   AUTH PAGE
    =================================================== */
 
 .auth-page {
@@ -759,9 +745,7 @@ input[type="time"].input-field {
   padding: 2rem 1.5rem;
 }
 
-.auth-header {
-  margin-bottom: 1.875rem;
-}
+.auth-header { margin-bottom: 1.875rem; }
 
 .auth-brand-pill {
   display: inline-flex;
@@ -809,30 +793,15 @@ input[type="time"].input-field {
   font-family: 'Inter', sans-serif;
 }
 
-.auth-footer a {
-  color: var(--blue);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.auth-footer a:hover {
-  text-decoration: underline;
-}
+.auth-footer a { color: var(--blue); font-weight: 700; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
 
 /* ===================================================
-   INPUT ROW (input + inline mic side by side)
+   INPUT ROW
    =================================================== */
 
-.input-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: stretch;
-}
-
-.input-row .input-field {
-  flex: 1;
-  margin-bottom: 0;
-}
+.input-row { display: flex; gap: 0.5rem; align-items: stretch; }
+.input-row .input-field { flex: 1; margin-bottom: 0; }
 
 /* ===================================================
    LOCATION CARDS
@@ -848,14 +817,14 @@ input[type="time"].input-field {
 .loc-card .loc-btn {
   flex: 1;
   min-height: 52px;
-  padding: 0.75rem 0.875rem;
+  padding: 0.75rem 1rem;
   border: var(--border-w) solid var(--border);
   border-radius: var(--radius);
   background: var(--canvas);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.625rem;
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink);
@@ -866,15 +835,8 @@ input[type="time"].input-field {
   font-family: 'Inter', sans-serif;
 }
 
-.loc-card .loc-btn:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translate(-1px, -1px);
-}
-
-.loc-card .loc-btn:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 0 var(--border);
-}
+.loc-card .loc-btn:hover { box-shadow: var(--shadow-hover); transform: translate(-1px, -1px); }
+.loc-card .loc-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 0 var(--border); }
 
 .loc-card .loc-delete {
   width: 44px;
@@ -894,21 +856,52 @@ input[type="time"].input-field {
   -webkit-tap-highlight-color: transparent;
 }
 
-.loc-card .loc-delete:hover {
-  background: var(--danger-bg);
-  border-color: var(--danger);
+.loc-card .loc-delete:hover { background: var(--danger-bg); border-color: var(--danger); }
+
+/* ===================================================
+   USER STAT STRIP (Home header area below hero)
+   =================================================== */
+
+.stat-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: var(--border-w) solid var(--border);
+  background: var(--canvas);
+}
+
+.stat-item {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-right: 1.5px solid var(--border-soft);
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-number {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+
+.stat-label {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  font-family: 'Inter', sans-serif;
 }
 
 /* ===================================================
    UTILITIES
    =================================================== */
 
-.divider {
-  height: 1.5px;
-  background: var(--border-soft);
-  margin: 1rem 0;
-}
-
+.divider { height: 1.5px; background: var(--border-soft); margin: 1rem 0; }
 .text-muted { color: var(--ink-muted); }
 .text-blue  { color: var(--blue); }
 .text-sm    { font-size: 0.875rem; }
@@ -921,11 +914,7 @@ input[type="time"].input-field {
 
 @media (min-width: 640px) {
   html { font-size: 16px; }
-
-  .content {
-    padding-bottom: 0;
-  }
-
+  .content { padding-bottom: 0; }
   .floating-action {
     position: static;
     padding: 0.875rem 1.25rem;

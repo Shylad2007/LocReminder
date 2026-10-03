@@ -168,14 +168,16 @@ export default function CreateReminder() {
             <p className="header-user">Step {step} of 3 — {stepLabel}</p>
           </div>
         </div>
-        {/* Step dots */}
-        <div style={{ display: 'flex', gap: '6px' }}>
+        {/* Step progress dots */}
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
           {[1, 2, 3].map(s => (
             <div key={s} style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: step >= s ? 'var(--blue)' : 'var(--border-soft)',
+              width: step === s ? 20 : 8,
+              height: 8,
+              borderRadius: 4,
+              background: step > s ? 'var(--ink)' : step === s ? 'var(--blue)' : 'var(--border-soft)',
               border: '1.5px solid var(--border)',
-              transition: 'background 0.2s'
+              transition: 'width 0.2s, background 0.2s'
             }} />
           ))}
         </div>
@@ -233,17 +235,17 @@ export default function CreateReminder() {
 
             <div className="choice-grid">
               <button className="choice-btn" onClick={() => handleTypeSelect('location')}>
-                <span className="choice-icon"><MapPin size={16} /></span>
-                <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>When I'm there</p>
-                  <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', fontWeight: 500 }}>Trigger by location</p>
+                <span className="choice-icon"><MapPin size={17} /></span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '0.9375rem', fontWeight: 700, lineHeight: 1.2 }}>When I'm there</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 500, marginTop: '0.15rem' }}>Trigger by GPS location</p>
                 </div>
               </button>
               <button className="choice-btn" onClick={() => handleTypeSelect('time')}>
-                <span className="choice-icon"><Clock size={16} /></span>
-                <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>At a specific time</p>
-                  <p style={{ fontSize: '0.72rem', color: 'var(--ink-muted)', fontWeight: 500 }}>Pick a date and time</p>
+                <span className="choice-icon"><Clock size={17} /></span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '0.9375rem', fontWeight: 700, lineHeight: 1.2 }}>At a specific time</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: 500, marginTop: '0.15rem' }}>Pick a date and time</p>
                 </div>
               </button>
             </div>
