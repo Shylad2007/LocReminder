@@ -40,7 +40,7 @@ export default function Signup() {
     return (
         <div className="auth-page">
             <div className="auth-header">
-                <p className="auth-brand">LocReminder</p>
+                <div className="auth-brand-pill">◆ LocReminder</div>
                 <h1>Create account</h1>
                 <p>Start remembering things when you're there.</p>
             </div>
