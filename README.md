@@ -9,8 +9,9 @@ People often remember something they need to do, but the reminder is useful only
 The primary constraint was **ONE THUMB** - the application must be fully usable with one thumb on a phone. This changed the design by forcing primary actions (like "REMEMBER SOMETHING" or "NEXT") to be large, easy to tap, and positioned near the bottom of the screen. Navigation menus were eliminated in favor of a straightforward, linear flow.
 
 ## The great part
-I focused primarily on the **Location Context Flow** and the **One-Thumb UI**. I focused on it because making location tracking simple and accessible without complex forms is critical to achieving the core value proposition of the app. The "Use my current location" button makes the process frictionless.
+I focused primarily on the **Location Context Flow**, **One-Thumb UI**, and **Memory Catch**. 
 
+The app features **Reusable Saved Locations**, so users don't have to repeatedly capture GPS coordinates for places they visit often. Additionally, I implemented **Voice Location Naming** (and voice reminder capture) using the browser-native `SpeechRecognition` API. By making the microphone button a large "hold-to-speak" target, it adheres perfectly to the one-thumb design constraint and makes capturing thoughts extremely fast before they disappear.
 ## The two testers
 ### Tester 1
 * Where tester 1 got stuck: [To be filled after testing]
