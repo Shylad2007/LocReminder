@@ -54,8 +54,12 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET environment variable is not defined');
+        }
+
         const payload = { userId: user._id };
-        const token = jwt.sign(payload, process.env.JWT_SECRET || 'fallback_secret_for_dev', { expiresIn: '7d' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.cookie('token', token, {
             httpOnly: true,

@@ -23,7 +23,7 @@ app.use('/api/reminders', reminderRoutes);
 app.use('/api/locations', locationRoutes);
 
 mongoose
-    .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/locreminder')
+    .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/locreminder')
     .then(() => {
         console.log('Connected to MongoDB');
         app.listen(PORT, () => {
