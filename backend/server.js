@@ -22,8 +22,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/reminders', reminderRoutes);
 app.use('/api/locations', locationRoutes);
 
+if (!process.env.MONGODB_URI) {
+    console.error('Fatal Error: MONGODB_URI environment variable is not defined.');
+    process.exit(1);
+}
+
 mongoose
-    .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/locreminder')
+    .connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('Connected to MongoDB');
         app.listen(PORT, () => {
